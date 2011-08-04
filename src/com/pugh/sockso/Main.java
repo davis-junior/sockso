@@ -1,6 +1,8 @@
 
 package com.pugh.sockso;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.pugh.sockso.db.Database;
 import com.pugh.sockso.db.DatabaseConnectionException;
 import com.pugh.sockso.db.DBExporter;
@@ -57,6 +59,7 @@ public class Main {
     private static Locale locale;
     private static Indexer indexer;
     private static SchedulerRunner sched;
+    private static Injector injector;
 
     /**
      *  application entry point
@@ -109,15 +112,17 @@ public class Main {
 
         setupAppDirectory();
         
+        injector = Guice.createInjector( new SocksoModule(options) );
+        
         try {
-            db = getDatabase( options );
+            db = injector.getInstance( Database.class );
             db.connect( options );
-        }        
+        }
         catch ( final Exception e ) {
             log.error( e );
             exit( 1 );
         }
-
+        
         //
         //  final setup from command line options before we try and do
         //  something kinda useful
@@ -200,7 +205,7 @@ public class Main {
         final String localeString = getLocale( options );
         
         log.info( "Initializing Resources (" + locale + ")" );
-        r = getResources( options );
+        r = injector.getInstance( Resources.class );
         r.init( localeString );
 
         locale = r.getCurrentLocale();
@@ -210,25 +215,24 @@ public class Main {
         }
 
         log.info( "Loading Properties" );
-        p = new DBProperties( db );
+        p = injector.getInstance( Properties.class );
         p.init();
 
-        log.info( "Creating Indexer" );
-        indexer = getIndexer();
-
         log.info( "Starting Scheduler" );
-        sched = new SchedulerRunner( indexer, p );
+        sched = injector.getInstance( SchedulerRunner.class );
         sched.start();
 
+        indexer = injector.getInstance( Indexer.class );
+        
         log.info( "Starting Collection Manager" );
-        cm = new DBCollectionManager( db, p, indexer );
+        cm = injector.getInstance( CollectionManager.class );
         indexer.addIndexListener( (DBCollectionManager) cm );
 
-        new CommunityUpdater( p ).start();
+        injector.getInstance( CommunityUpdater.class ).start();
 
-        new SessionCleaner( db ).init();
+        injector.getInstance( SessionCleaner.class ).init();
 
-        final IpFinder ipFinder = new IpFinder( p, options );
+        final IpFinder ipFinder = injector.getInstance( IpFinder.class );
         ipFinder.init();
 
         final int port = getSavedPort( p );
@@ -247,7 +251,7 @@ public class Main {
 
         manager = getManager( useGui, ipFinder );
 
-        final VersionChecker versionChecker = new VersionChecker( p );
+        final VersionChecker versionChecker = injector.getInstance( VersionChecker.class );
         versionChecker.addLatestVersionListener( manager );
         versionChecker.fetchLatestVersion();
         

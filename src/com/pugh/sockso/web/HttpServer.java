@@ -20,12 +20,15 @@ import joptsimple.OptionSet;
 
 import org.apache.log4j.Logger;
 
+import com.google.inject.Singleton;
+
 /**
  * 
  * A basic HTTP server.
  * 
  */
 
+@Singleton
 public class HttpServer extends Thread implements Server, PropertiesListener {
 
     public static final int DEFAULT_PORT = 4444;

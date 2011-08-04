@@ -14,11 +14,14 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 import joptsimple.OptionSet;
 
+import com.google.inject.Singleton;
+
 /**
  *  extends the main HttpServer class to add HTTPS support
  * 
  */
 
+@Singleton
 public class HttpsServer extends HttpServer {
 
     private String sslKeystore = "ssl/keystore",

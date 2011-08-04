@@ -24,8 +24,6 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 
-import java.sql.SQLException;
-
 /**
  *  End point for Sockso Web API methods.
  * 

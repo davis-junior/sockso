@@ -42,6 +42,7 @@ import com.pugh.sockso.web.action.playlist.Xspfer;
 
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.pugh.sockso.auth.Authenticator;
 
 /**
  *  looks at the request to determine which web action to invoke
@@ -104,7 +105,7 @@ public class Dispatcher {
             action = getBrowseAction( req );
         
         else if ( command.equals("") )
-            action = new Homer();
+            action = injector.getInstance( Homer.class );
         
         else if ( command.equals("xspf") )
             action = new Xspfer( protocol );
@@ -114,33 +115,33 @@ public class Dispatcher {
             action = new Plser( protocol );
         
         else if ( command.equals("stream") ) {
-            action = new Streamer();
+            action = injector.getInstance( Streamer.class );
         }
         
         else if ( command.equals("api") ) {
-            action = new Api();
+            action = injector.getInstance( Api.class );
         }
 
         else if ( command.equals("json") )
-            action = new Jsoner( cm, cache );
+            action = injector.getInstance( Jsoner.class );
         
         else if ( command.equals("user") ) {
-            final Userer u = new Userer();
-            u.addAuthenticator( new DBAuthenticator(db) );
+            final Userer u = injector.getInstance( Userer.class );
+            u.addAuthenticator( injector.getInstance(Authenticator.class) );
             action = u;
         }
         
         else if ( command.equals("player") )
-            action = new Player();
+            action = injector.getInstance( Player.class );
         
         else if ( command.equals("download") )
-            action = new Downloader();
+            action = injector.getInstance( Downloader.class );
         
         else if ( command.equals("upload") )
-            action = new Uploader( cm );
+            action = injector.getInstance( Uploader.class );
         
         else if ( command.equals("share") )
-            action = new Sharer();
+            action = injector.getInstance( Sharer.class );
         
         else if ( command.equals("rss") )
             action = new Feeder( host );
@@ -150,7 +151,7 @@ public class Dispatcher {
         }
         
         else if ( command.equals("nat") ) {
-            action = new Nater();
+            action = injector.getInstance( Nater.class );
         }
                 
         if ( action != null ) {
@@ -176,28 +177,28 @@ public class Dispatcher {
         final String command = req.getUrlParam( 1 );
         
         if ( command.equals("folders") )
-            return new Folderer();
+            return injector.getInstance( Folderer.class );
         
         else if ( command.equals("popular") )
-            return new Popularer();
+            return injector.getInstance( Popularer.class );
         
         else if ( command.equals("latest") )
-            return new Latester();
+            return injector.getInstance( Latester.class );
         
         else if ( command.equals("letter") )
-            return new ByLetterer();
+            return injector.getInstance( ByLetterer.class );
 
         else if ( command.equals("artist") )
-            return new Artister();
+            return injector.getInstance( Artister.class );
 
         else if ( command.equals("album"))
-            return new Albumer();
+            return injector.getInstance( Albumer.class );
 
         else if ( command.equals("playlists"))
-            return new Playlistser();
+            return injector.getInstance( Playlistser.class );
 
         else if ( command.equals("playlist"))
-            return new Playlister();
+            return injector.getInstance( Playlister.class );
 
         else return null;
         
@@ -217,7 +218,7 @@ public class Dispatcher {
         final String command = req.getUrlParam( 1 );
 
         if ( command.equals("console") ) {
-            return new Console( cm );
+            return injector.getInstance( Console.class  );
         }
 
         return null;

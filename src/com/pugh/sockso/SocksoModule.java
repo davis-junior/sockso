@@ -6,6 +6,8 @@ import com.pugh.sockso.db.MySQLDatabase;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
+import com.pugh.sockso.auth.Authenticator;
+import com.pugh.sockso.auth.DBAuthenticator;
 import com.pugh.sockso.db.HSQLDatabase;
 import com.pugh.sockso.db.SQLiteDatabase;
 import com.pugh.sockso.music.CollectionManager;
@@ -40,6 +42,7 @@ public class SocksoModule extends AbstractModule {
         configureProperties();
         configureIndexer();
         configureCollectionManager();
+        configureAuthenticator();
         
     }
     
@@ -97,6 +100,12 @@ public class SocksoModule extends AbstractModule {
     private void configureCollectionManager() {
         
         bind( CollectionManager.class ).to( DBCollectionManager.class );
+        
+    }
+    
+    private void configureAuthenticator() {
+        
+        bind( Authenticator.class ).to( DBAuthenticator.class );
         
     }
     

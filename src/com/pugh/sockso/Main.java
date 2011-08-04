@@ -238,7 +238,8 @@ public class Main {
         final int port = getSavedPort( p );
         final String protocol = getProtocol( options );
 
-        dispatcher = new Dispatcher( protocol, port, p, r, cm, db, new ObjectCache() );
+        dispatcher = injector.getInstance( Dispatcher.class );
+        dispatcher.init( protocol, port );
         
         log.info( "Starting Web Server" );
         sv = getServer( port, options );

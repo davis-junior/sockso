@@ -47,6 +47,7 @@ import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
 import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 @Singleton
@@ -57,9 +58,13 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
     private final Database db;
     private final Properties p;
     private final CollectionManager cm;
+    private final Locale locale;
+    private final Injector injector;
+    
     protected final Server sv;
     protected final Resources r;
     protected final IpFinder ipFinder;
+    
     private TrayIcon tray = null;
     private JLabel urlLabel;
     private ConsoleFrame consoleFrame;
@@ -70,16 +75,19 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
      */
     
     @Inject
-    public AppFrame( final Database db, final Properties p, final Server sv, final CollectionManager cm, final Resources r, final IpFinder ipFinder ) {
+    public AppFrame( final Injector injector, final Database db, final Properties p, final Server sv, final CollectionManager cm,
+                     final Resources r, final IpFinder ipFinder, final Locale locale ) {
 
-        super( r == null ? "" : r.getCurrentLocale().getString("gui.window.main") + " (" +Sockso.VERSION+ ")" );
+        super( locale == null ? "" : locale.getString("gui.window.main") + " (" +Sockso.VERSION+ ")" );
 
+        this.injector = injector;
         this.db = db;
         this.p = p;
         this.sv = sv;
         this.cm = cm;
         this.r = r;
         this.ipFinder = ipFinder;
+        this.locale = locale;
         
         urlLabel = new JLabel();
         tray = new TrayIcon( this, r );
@@ -183,8 +191,6 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
     
     private JPanel getBottomPane() {
         
-        final Locale locale = r.getCurrentLocale();
-
         final JButton exit = new JButton( locale.getString("gui.label.exit"), new ImageIcon(r.getImage("icons/22x22/exit.png")) );
         exit.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent evt ) {
@@ -203,7 +209,7 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
         console.addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent evt ) {
                 if ( consoleFrame == null ) {
-                    consoleFrame = new ConsoleFrame( db, p, cm, r );
+                    consoleFrame = injector.getInstance( ConsoleFrame.class );
                     consoleFrame.setBounds( 100, 100, 600, 500 );
                 }
                 consoleFrame.setVisible( true );
@@ -213,7 +219,7 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
         // in admin mode we won't have a server
         if ( sv != null ) {
             urlLabel.setText( locale.getString("gui.label.gettingIPAddress") );
-            urlLabel.addMouseListener( new UrlLabelMouseAdapter(this,sv,r,ipFinder) );
+            urlLabel.addMouseListener( injector.getInstance(UrlLabelMouseAdapter.class) );
             urlLabel.setToolTipText( "Click to open Sockso in your browser." );
             updateUrlLabel();
         }
@@ -241,7 +247,6 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
     protected void updateUrlLabel() {
 
         final String myurl = sv.getProtocol() +"://" + sv.getHost();
-        final Locale locale = r.getCurrentLocale();
         
         urlLabel.setText( "<html><head><title></title></head><body>" +
                 "&nbsp; " + locale.getString("gui.label.yourAddress") + ": <a href='" + myurl + "'>" + myurl + "</a>" +
@@ -270,28 +275,27 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
     private JTabbedPane getMainPane() {
        
         final JTabbedPane pane = new JTabbedPane();
-        final Locale locale = r.getCurrentLocale();
         
-        final MusicPanel musicPanel = new MusicPanel( this, db, cm, r );
+        final MusicPanel musicPanel = injector.getInstance( MusicPanel.class );
         musicPanel.init();
 
-        final UsersPanel usersPanel = new UsersPanel( this, db, p, r );
+        final UsersPanel usersPanel = injector.getInstance( UsersPanel.class );
         usersPanel.init();
         
         pane.addTab( locale.getString("gui.label.music"), new ImageIcon(r.getImage("icons/22x22/music.png")),
             musicPanel, locale.getString("gui.tooltip.music") );
         
         pane.addTab( locale.getString("gui.label.collection"), new ImageIcon(r.getImage("icons/22x22/collection.png")),
-            new CollectionPanel(this,db,cm,r,p), locale.getString("gui.tooltip.collection") );
+            injector.getInstance(CollectionPanel.class), locale.getString("gui.tooltip.collection") );
         
         pane.addTab( locale.getString("gui.label.users"), new ImageIcon(r.getImage("icons/22x22/users.png")),
             usersPanel, locale.getString("gui.tooltip.users") );
         
         pane.addTab( locale.getString("gui.label.general"), new ImageIcon(r.getImage("icons/22x22/general.png")),
-            new GeneralPanel(this,db,p,r,sv,cm), locale.getString("gui.tooltip.general") );
+            injector.getInstance(GeneralPanel.class), locale.getString("gui.tooltip.general") );
 
         pane.addTab( locale.getString("gui.label.encoders"), new ImageIcon(r.getImage("icons/22x22/encoders.png")),
-            new EncodersPanel(this,p,r), locale.getString("gui.tooltip.encoders") );
+            injector.getInstance(EncodersPanel.class), locale.getString("gui.tooltip.encoders") );
 
         return pane;
 
@@ -334,7 +338,6 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
             
             Splash.closeNow();
 
-            final Locale locale = r.getCurrentLocale();
             final String message = locale.getString(
                 "misc.msg.updateAvailable",
                 new String[] { latestVersion }
@@ -362,6 +365,7 @@ class UrlLabelMouseAdapter extends MouseAdapter {
     private final Resources r;
     private final JPopupMenu menu;
     private final IpFinder ipFinder;
+    private final Locale locale;
     
     /**
      *  creates the mouse adapter
@@ -370,12 +374,15 @@ class UrlLabelMouseAdapter extends MouseAdapter {
      *  
      */
     
-    public UrlLabelMouseAdapter( final JFrame parent, final Server sv, final Resources r, final IpFinder ipFinder ) {
+    @Inject
+    public UrlLabelMouseAdapter( final AppFrame parent, final Server sv, final Resources r,
+                                 final IpFinder ipFinder, final Locale locale ) {
 
         this.parent = parent;
         this.sv = sv;
         this.r = r;
         this.ipFinder = ipFinder;
+        this.locale = locale;
         
         this.menu = createPopupMenu();
 
@@ -437,7 +444,6 @@ class UrlLabelMouseAdapter extends MouseAdapter {
     private JPopupMenu createPopupMenu() {
         
         final JPopupMenu popup = new JPopupMenu();
-        final Locale locale = r.getCurrentLocale();
         
         final JMenuItem inet = new JMenuItem( locale.getString("gui.label.internetAddress") );
         inet.setFont( inet.getFont().deriveFont(Font.BOLD) );

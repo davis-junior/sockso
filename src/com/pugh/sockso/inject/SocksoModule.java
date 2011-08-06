@@ -1,6 +1,12 @@
 
 package com.pugh.sockso.inject;
 
+import com.pugh.sockso.Console;
+import com.pugh.sockso.DBProperties;
+import com.pugh.sockso.Manager;
+import com.pugh.sockso.Options;
+import com.pugh.sockso.Properties;
+import com.pugh.sockso.resources.Locale;
 import com.pugh.sockso.auth.Authenticator;
 import com.pugh.sockso.auth.DBAuthenticator;
 import com.pugh.sockso.db.Database;
@@ -24,13 +30,6 @@ import joptsimple.OptionSet;
 import org.apache.log4j.Logger;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
-import com.pugh.sockso.Console;
-import com.pugh.sockso.DBProperties;
-import com.pugh.sockso.Manager;
-import com.pugh.sockso.Options;
-import com.pugh.sockso.Properties;
-import com.pugh.sockso.resources.Locale;
 
 public class SocksoModule extends AbstractModule {
     

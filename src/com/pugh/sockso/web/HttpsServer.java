@@ -2,8 +2,6 @@
 package com.pugh.sockso.web;
 
 import com.pugh.sockso.Options;
-import com.pugh.sockso.db.Database;
-import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.Properties;
 
 import java.io.IOException;
@@ -15,6 +13,7 @@ import joptsimple.OptionSet;
 
 import com.google.inject.Singleton;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  *  extends the main HttpServer class to add HTTPS support
@@ -40,9 +39,9 @@ public class HttpsServer extends HttpServer {
      */
     
     @Inject
-    public HttpsServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
+    public HttpsServer( final Properties p, final Injector injector ) {
 
-        super( dispatcher, db, p, r );
+        super( injector, p );
 
     }
 

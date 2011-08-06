@@ -4,8 +4,6 @@ package com.pugh.sockso.web;
 import com.pugh.sockso.Constants;
 import com.pugh.sockso.Properties;
 import com.pugh.sockso.PropertiesListener;
-import com.pugh.sockso.db.Database;
-import com.pugh.sockso.resources.Resources;
 
 import java.io.IOException;
 
@@ -22,6 +20,7 @@ import org.apache.log4j.Logger;
 
 import com.google.inject.Singleton;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 
 /**
  * 
@@ -34,10 +33,8 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
 
     public static final int DEFAULT_PORT = 4444;
 
-    private final Dispatcher dispatcher;
-    private final Database db;
+    private final Injector injector;
     private final Properties p;
-    private final Resources r;
     private final Vector<ServerThread> threads;
     
     private int port = DEFAULT_PORT;
@@ -49,21 +46,16 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
      *  Creates a new instance of a http server.  If the ip address given is null,
      *  then the server will try and work it out for itself.
      *
-     *  @param port
-     *  @param dispatcher
-     *  @param db the database to use
+     *  @param injector
      *  @param p app properties
-     *  @param r resources
      *
      */
 
     @Inject
-    public HttpServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
+    public HttpServer( final Injector injector, final Properties p ) {
 
-        this.dispatcher = dispatcher;
-        this.db = db;
+        this.injector = injector;
         this.p = p;
-        this.r = r;
 
         threads = new Vector<ServerThread>();
 
@@ -101,7 +93,7 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
             ss = getServerSocket( port );
             log.info( "Listening on " + port );
             while ( true ) {
-                handleRequest( ss.accept(), dispatcher );
+                handleRequest( ss.accept());
             }
         }
 
@@ -122,11 +114,11 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
      *
      */
 
-    protected void handleRequest( final Socket client, final Dispatcher dispatcher ) {
+    protected void handleRequest( final Socket client ) {
 
         //log.debug( "Connection Received" );
 
-        ServerThread st = new ServerThread( this, client, db, p, r, dispatcher );
+        ServerThread st = injector.getInstance( ServerThread.class );
         threads.addElement( st );
         st.start();
 

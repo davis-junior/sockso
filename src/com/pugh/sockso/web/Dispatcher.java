@@ -107,12 +107,23 @@ public class Dispatcher {
         else if ( command.equals("") )
             action = injector.getInstance( Homer.class );
         
-        else if ( command.equals("xspf") )
-            action = new Xspfer( protocol );
-        else if ( command.equals("m3u") )
-            action = new M3uer( protocol );
-        else if ( command.equals("pls") )
-            action = new Plser( protocol );
+        else if ( command.equals("xspf") ) {
+            Xspfer xspf = injector.getInstance( Xspfer.class );
+            xspf.init( protocol );
+            action = xspf;
+        }
+                
+        else if ( command.equals("m3u") ) {
+            M3uer m3u = injector.getInstance( M3uer.class );
+            m3u.init( protocol );
+            action = m3u;
+        }
+                
+        else if ( command.equals("pls") ) {
+            Plser pls = injector.getInstance( Plser.class );
+            pls.init( protocol );
+            action = pls;
+        }
         
         else if ( command.equals("stream") ) {
             action = injector.getInstance( Streamer.class );
@@ -143,8 +154,11 @@ public class Dispatcher {
         else if ( command.equals("share") )
             action = injector.getInstance( Sharer.class );
         
-        else if ( command.equals("rss") )
-            action = new Feeder( host );
+        else if ( command.equals("rss") ) {
+            final Feeder feeder = injector.getInstance( Feeder.class );
+            feeder.init( host );
+            action = feeder;
+        }
 
         else if ( command.equals("admin") ) {
             action = getAdminAction( req );
@@ -154,11 +168,6 @@ public class Dispatcher {
             action = injector.getInstance( Nater.class );
         }
                 
-        if ( action != null ) {
-            action.setDatabase( db );
-            action.setProperties( p );
-        }
-        
         return action;
         
     }

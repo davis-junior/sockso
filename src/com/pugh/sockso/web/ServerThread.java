@@ -11,6 +11,7 @@ import com.pugh.sockso.Constants;
 import com.pugh.sockso.Properties;
 import com.pugh.sockso.db.Database;
 import com.pugh.sockso.resources.Locale;
+import com.pugh.sockso.resources.LocaleFactory;
 import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.web.action.Errorer;
 import com.pugh.sockso.web.action.BaseAction;
@@ -34,6 +35,7 @@ public class ServerThread extends Thread {
     private final Properties p;
     private final Resources r;
     private final Dispatcher dispatcher;
+    private final LocaleFactory localeFactory;
 
     /**
      *  Creates a new instance of ServerThread
@@ -47,7 +49,8 @@ public class ServerThread extends Thread {
      */
     
     public ServerThread( final Server server, final Socket client, final Database db,
-                         final Properties p, final Resources r, final Dispatcher dispatcher ) {
+                         final Properties p, final Resources r, final Dispatcher dispatcher,
+                         final LocaleFactory localeFactory ) {
 
         this.sv = server;
         this.client = client;
@@ -55,6 +58,7 @@ public class ServerThread extends Thread {
         this.p = p;
         this.r = r;
         this.dispatcher = dispatcher;
+        this.localeFactory = localeFactory;
                 
     }
     
@@ -69,14 +73,14 @@ public class ServerThread extends Thread {
         Response res = null;
         Request req = null;
         User user = null;
-        Locale locale = r.getCurrentLocale();
+        Locale locale = localeFactory.getDefaultLocale();
         
         try {
 
             req = new HttpRequest( sv );
             req.process( new BufferedInputStream(client.getInputStream()) );
 
-            locale = r.getLocale( req.getPreferredLangCode() );
+            locale = localeFactory.getLocale( req.getPreferredLangCode() );
 
             final Session session = new Session( db, req, null );
             user = session.getCurrentUser();

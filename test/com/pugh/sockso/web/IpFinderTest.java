@@ -191,23 +191,4 @@ public class IpFinderTest extends SocksoTestCase {
 
     }
 
-    /**
-     *  empty implementation for testing
-     *
-     */
-
-    class MyHttpServer extends HttpServer {
-        public MyHttpServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
-            super( dispatcher, db, p, r );
-        }
-        public ServerSocket getServerSocket( final int port ) throws IOException {
-            return null;
-        }
-        public String getProtocol() {
-            return "http";
-        }
-    }
-
-    class MySocket extends Socket {}
-
 }

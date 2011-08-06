@@ -3,7 +3,6 @@ package com.pugh.sockso.gui;
 
 import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.resources.Locale;
-import com.pugh.sockso.db.Database;
 import com.pugh.sockso.music.CollectionManager;
 import com.pugh.sockso.gui.action.ImportPlaylist;
 
@@ -37,7 +36,6 @@ public class MusicPanel extends JPanel {
     
     private final JFrame parent;
     private final Resources r;
-    private final Database db;
     private final CollectionManager cm;
     private final Locale locale;
     private final Injector injector;
@@ -52,12 +50,11 @@ public class MusicPanel extends JPanel {
      */
     
     @Inject
-    public MusicPanel( final AppFrame parent, final Database db, final CollectionManager cm,
-                       final Resources r, final Locale locale, final Injector injector ) {
+    public MusicPanel( final AppFrame parent, final CollectionManager cm, final Resources r,
+                       final Locale locale, final Injector injector ) {
     
         this.parent = parent;
         this.r = r;
-        this.db = db;
         this.cm = cm;
         this.locale = locale;
         this.injector = injector;
@@ -74,7 +71,7 @@ public class MusicPanel extends JPanel {
 
         final ActionListener importPlaylistAction = injector.getInstance( ImportPlaylist.class );
 
-        final MusicTree musicTree = new MusicTree( db );
+        final MusicTree musicTree = injector.getInstance( MusicTree.class );
         final JSplitPane playlistsPanel = new JSplitPane(
             JSplitPane.VERTICAL_SPLIT,
             getSitePlaylistsPanel( sitePlaylists, importPlaylistAction ),
@@ -91,7 +88,7 @@ public class MusicPanel extends JPanel {
             new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 tabbedPane,
-                new PlaylistManager( parent, db, cm, r )
+                injector.getInstance( PlaylistManager.class )
             ),
             BorderLayout.CENTER
         );

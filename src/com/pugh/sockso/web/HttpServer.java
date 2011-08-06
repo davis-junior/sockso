@@ -60,7 +60,7 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
         threads = new Vector<ServerThread>();
 
     }
-
+    
     /**
      *  starts the web server, optionally binding to a specific ip (if this
      *  is null then we'll try and work it out ourselves)
@@ -75,7 +75,6 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
         
         p.addPropertiesListener( this );
 
-        // start the server thread
         start();
 
     }

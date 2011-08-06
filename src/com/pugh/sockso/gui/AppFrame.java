@@ -55,15 +55,12 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
     
     private static final Logger log = Logger.getLogger( AppFrame.class );
     
-    private final Database db;
     private final Properties p;
-    private final CollectionManager cm;
     private final Locale locale;
     private final Injector injector;
     
     protected final Server sv;
     protected final Resources r;
-    protected final IpFinder ipFinder;
     
     private TrayIcon tray = null;
     private JLabel urlLabel;
@@ -75,18 +72,15 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
      */
     
     @Inject
-    public AppFrame( final Injector injector, final Database db, final Properties p, final Server sv, final CollectionManager cm,
-                     final Resources r, final IpFinder ipFinder, final Locale locale ) {
+    public AppFrame( final Injector injector, final Properties p, final Server sv,
+                     final Resources r, final Locale locale ) {
 
         super( locale == null ? "" : locale.getString("gui.window.main") + " (" +Sockso.VERSION+ ")" );
 
         this.injector = injector;
-        this.db = db;
         this.p = p;
         this.sv = sv;
-        this.cm = cm;
         this.r = r;
-        this.ipFinder = ipFinder;
         this.locale = locale;
         
         urlLabel = new JLabel();

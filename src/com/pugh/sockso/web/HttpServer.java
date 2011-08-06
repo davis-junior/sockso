@@ -116,10 +116,11 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
 
     protected void handleRequest( final Socket client ) {
 
-        //log.debug( "Connection Received" );
-
-        ServerThread st = injector.getInstance( ServerThread.class );
+        final ServerThread st = injector.getInstance( ServerThread.class );
+        
         threads.addElement( st );
+        
+        st.setClientSocket( client );
         st.start();
 
     }

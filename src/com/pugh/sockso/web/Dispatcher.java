@@ -1,14 +1,10 @@
 
 package com.pugh.sockso.web;
 
-import com.pugh.sockso.ObjectCache;
 import com.pugh.sockso.Constants;
 import com.pugh.sockso.Properties;
 
 import com.pugh.sockso.auth.DBAuthenticator;
-import com.pugh.sockso.db.Database;
-import com.pugh.sockso.music.CollectionManager;
-import com.pugh.sockso.resources.Resources;
 
 import com.pugh.sockso.web.action.AdminAction;
 import com.pugh.sockso.web.action.Api;
@@ -53,27 +49,26 @@ import com.google.inject.Singleton;
 public class Dispatcher {
 
     private final Properties p;
-    private final Resources r;
-    private final CollectionManager cm;
-    private final Database db;
-    private final ObjectCache cache;
     private final Injector injector;
     
     private String protocol;
     private int port;
     
     @Inject
-    public Dispatcher( final Properties p, final Resources r, final CollectionManager cm, final Database db,
-                       final ObjectCache cache, final Injector injector ) {
+    public Dispatcher( final Injector injector, final Properties p ) {
 
-        this.p = p;
-        this.r = r;
-        this.cm = cm;
-        this.db = db;
-        this.cache = cache;
         this.injector = injector;
+        this.p = p;
         
     }
+    
+    /**
+     *  Initialise the dispatcher with non-injectables
+     * 
+     *  @param protocol
+     *  @param port 
+     * 
+     */
     
     public void init( final String protocol, final int port ) {
         

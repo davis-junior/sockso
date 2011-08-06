@@ -90,7 +90,10 @@ public class Api extends BaseAction {
                 
                 log.debug( "Run API action: " +action.getClass().getName() );
             
-                action.init( getRequest(), getResponse(), getUser(), getLocale() );
+                action.setRequest( req );
+                action.setResponse( getResponse() );
+                action.setUser( getUser() );
+                action.setLocale( getLocale() );
                 action.setDatabase( getDatabase() );
                 action.setProperties( getProperties() );
                 

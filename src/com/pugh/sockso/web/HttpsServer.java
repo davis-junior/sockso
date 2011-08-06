@@ -3,7 +3,6 @@ package com.pugh.sockso.web;
 
 import com.pugh.sockso.Options;
 import com.pugh.sockso.db.Database;
-import com.pugh.sockso.music.CollectionManager;
 import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.Properties;
 
@@ -15,6 +14,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 import joptsimple.OptionSet;
 
 import com.google.inject.Singleton;
+import com.google.inject.Inject;
 
 /**
  *  extends the main HttpServer class to add HTTPS support
@@ -39,9 +39,10 @@ public class HttpsServer extends HttpServer {
      * 
      */
     
-    public HttpsServer( final int port, final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
+    @Inject
+    public HttpsServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
 
-        super( port, dispatcher, db, p, r );
+        super( dispatcher, db, p, r );
 
     }
 
@@ -69,7 +70,7 @@ public class HttpsServer extends HttpServer {
     }
 
     @Override
-    public void start( final OptionSet options ) {
+    public void start( final OptionSet options, final int port ) {
         
         if ( options.has(Options.OPT_SSL_KEYSTORE) )
             sslKeystore = options.valueOf( Options.OPT_SSL_KEYSTORE ).toString();
@@ -78,7 +79,7 @@ public class HttpsServer extends HttpServer {
             sslKeystorePassword = options.valueOf( Options.OPT_SSL_PASSWORD ).toString();
 
         // then call parent method to start server
-        super.start( options );
+        super.start( options, port );
         
     }
 

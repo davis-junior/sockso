@@ -3,6 +3,7 @@ package com.pugh.sockso.web;
 
 import com.pugh.sockso.Constants;
 import com.pugh.sockso.Properties;
+import com.pugh.sockso.StringProperties;
 import com.pugh.sockso.db.Database;
 import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.music.CollectionManager;
@@ -25,7 +26,7 @@ public class HttpServerTest extends TestCase {
     
     class MyHttpServer extends HttpServer {
         public MyHttpServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
-            super( 4444, dispatcher, db, p, r );
+            super( dispatcher, db, p, r );
         }
         public ServerSocket getServerSocket( final int port ) throws IOException {
             return null;
@@ -37,18 +38,15 @@ public class HttpServerTest extends TestCase {
         
     public void testGetHost() {
         
-        final Properties p = createMock( Properties.class );
-        final String expectedIp = "123.435.324.653";
+        StringProperties p = new StringProperties();
+        String expectedIp = "123.435.324.653";
         
-        expect( p.get(Constants.SERVER_HOST) ).andReturn( expectedIp );
-        replay( p );
+        p.set( Constants.SERVER_HOST, expectedIp );
 
         final MyHttpServer s = new MyHttpServer( null, null, p, null );
-        final String actualIp = s.getHost();
         
-        assertEquals( expectedIp + ":4444", actualIp );
         
-        verify( p );
+        assertEquals( expectedIp + ":4444", s.getHost() );
 
     }
      

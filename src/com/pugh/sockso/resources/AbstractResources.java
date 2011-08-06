@@ -78,11 +78,9 @@ public abstract class AbstractResources implements Resources {
      */
     
     public Locale getCurrentLocale() {
+        
         return getLocale( localeCode );
-    }
-    
-    public void setCurrentLocaleCode( final String newLocale ) {
-        localeCode = newLocale;
+        
     }
     
     /**

@@ -1,31 +1,24 @@
 
 package com.pugh.sockso;
 
+import com.pugh.sockso.inject.SocksoModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.pugh.sockso.db.Database;
-import com.pugh.sockso.db.DatabaseConnectionException;
 import com.pugh.sockso.db.DBExporter;
-import com.pugh.sockso.db.HSQLDatabase;
-import com.pugh.sockso.db.MySQLDatabase;
-import com.pugh.sockso.db.SQLiteDatabase;
-import com.pugh.sockso.gui.AppFrame;
 import com.pugh.sockso.gui.Splash;
 import com.pugh.sockso.music.CollectionManager;
 import com.pugh.sockso.music.DBCollectionManager;
 import com.pugh.sockso.music.indexing.Indexer;
-import com.pugh.sockso.music.indexing.TrackIndexer;
 import com.pugh.sockso.music.scheduling.SchedulerRunner;
-import com.pugh.sockso.resources.FileResources;
-import com.pugh.sockso.resources.JarResources;
 import com.pugh.sockso.resources.Resources;
 import com.pugh.sockso.resources.Locale;
+import com.pugh.sockso.resources.LocaleFactory;
 import com.pugh.sockso.web.Dispatcher;
 import com.pugh.sockso.web.IpFinder;
 import com.pugh.sockso.web.Server;
 import com.pugh.sockso.web.SessionCleaner;
 import com.pugh.sockso.web.HttpServer;
-import com.pugh.sockso.web.HttpsServer;
 
 import java.io.File;
 import java.io.IOException;
@@ -208,8 +201,9 @@ public class Main {
         r = injector.getInstance( Resources.class );
         r.init( localeString );
 
-        locale = r.getCurrentLocale();
-
+        LocaleFactory localeFactory = injector.getInstance( LocaleFactory.class );
+        localeFactory.init( localeString );
+        
         if ( useGui ) {
             Splash.start( r );
         }
@@ -242,15 +236,15 @@ public class Main {
         dispatcher.init( protocol, port );
         
         log.info( "Starting Web Server" );
-        sv = getServer( port, options );
-        sv.start( options );
+        sv = injector.getInstance( Server.class );
+        sv.start( options, port );
 
         if ( options.has(Options.OPT_UPNP) ) {
             log.info( "Trying UPNP Magic" );
             UPNP.tryPortForwarding( sv.getPort() );
         }
 
-        manager = getManager( useGui, ipFinder );
+        manager = injector.getInstance( Manager.class );
 
         final VersionChecker versionChecker = injector.getInstance( VersionChecker.class );
         versionChecker.addLatestVersionListener( manager );
@@ -260,56 +254,6 @@ public class Main {
 
     }
 
-    /**
-     *  Works out if we're using the GUI or the console
-     *
-     *  @param useGui
-     *  @param ipFinder
-     *
-     *  @return
-     *
-     */
-
-    public static Manager getManager( final boolean useGui, final IpFinder ipFinder ) {
-
-        return ( useGui )
-            ? new AppFrame( db, p, sv, cm, r, ipFinder )
-            : new Console( db, p, cm, locale );
-
-    }
-
-    /**
-     *  returns the correct database to use
-     * 
-     *  @param options
-     * 
-     *  @return
-     * 
-     */
-    
-    protected static Database getDatabase( final OptionSet options ) throws DatabaseConnectionException {
-
-        final String dbtype = options.has( Options.OPT_DBTYPE )
-            ? options.valueOf(Options.OPT_DBTYPE).toString() : "";
-
-        // mysql
-        if ( dbtype.equals("mysql") ) {
-            log.info( "Using MySQL Database" );
-            return new MySQLDatabase();
-        }
-        
-        // sqlite
-        if ( dbtype.equals("sqlite") ) {
-            log.info( "Using sqlite Database" );
-            return new SQLiteDatabase();
-        }
-
-        // hsql (default)
-        log.info( "Using HSQL Database" );
-        return new HSQLDatabase();
-
-    }
-    
     /**
      *  returns a boolean indicating if we should start the GUI or not
      * 
@@ -343,28 +287,6 @@ public class Main {
     }
     
     /**
-     *  returns the resources object to use
-     * 
-     *  @param options
-     * 
-     *  @return
-     * 
-     */
-    
-    protected static Resources getResources( final OptionSet options ) {
-
-        final String resourceType = options.has( Options.OPT_RESOURCESTYPE )
-            ? options.valueOf(Options.OPT_RESOURCESTYPE).toString() : "";
-
-        log.debug( "Resources type: " +resourceType );
-        
-        return resourceType.equals( "jar" )
-            ? new JarResources()
-            : new FileResources();
-
-    }
-
-    /**
      *  Returns the protocol to use for web serving
      *
      *  @param options
@@ -378,36 +300,6 @@ public class Main {
         return options.has( Options.OPT_SSL )
             ? "https"
             : "http";
-        
-    }
-
-    /**
-     *  returns the server to use
-     * 
-     *  @param options
-     * 
-     *  @return
-     * 
-     */
-    
-    protected static Server getServer( final int port, final OptionSet options ) {
-
-        return options.has( Options.OPT_SSL )
-            ? new HttpsServer( port, dispatcher, db, p, r )
-            : new HttpServer( port, dispatcher, db, p, r );
-
-    }
-
-    /**
-     *  Returns the Indexer to use
-     *
-     *  @return
-     *
-     */
-
-    protected static Indexer getIndexer() {
-
-        return new TrackIndexer( db );
         
     }
 

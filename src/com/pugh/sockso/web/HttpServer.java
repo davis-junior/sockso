@@ -21,6 +21,7 @@ import joptsimple.OptionSet;
 import org.apache.log4j.Logger;
 
 import com.google.inject.Singleton;
+import com.google.inject.Inject;
 
 /**
  * 
@@ -37,9 +38,10 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
     private final Database db;
     private final Properties p;
     private final Resources r;
-    private ServerSocket ss;
     private final Vector<ServerThread> threads;
-    private int port;
+    
+    private int port = DEFAULT_PORT;
+    private ServerSocket ss;
 
     private static Logger log = Logger.getLogger(Server.class);
 
@@ -55,9 +57,9 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
      *
      */
 
-    public HttpServer( final int port, final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
+    @Inject
+    public HttpServer( final Dispatcher dispatcher, final Database db, final Properties p, final Resources r ) {
 
-        this.port = port;
         this.dispatcher = dispatcher;
         this.db = db;
         this.p = p;
@@ -75,8 +77,10 @@ public class HttpServer extends Thread implements Server, PropertiesListener {
      *
      */
 
-    public void start( final OptionSet options ) {
+    public void start( final OptionSet options, final int port ) {
 
+        this.port = port;
+        
         p.addPropertiesListener( this );
 
         // start the server thread

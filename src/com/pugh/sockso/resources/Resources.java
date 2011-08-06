@@ -69,14 +69,4 @@ public interface Resources {
     
     public abstract Locale getCurrentLocale();
     
-    /**
-     *  sets the default locale to use
-     * 
-     *  @param newLocale the new default locale
-     * 
-     *
-     */
-    
-    public abstract void setCurrentLocaleCode( final String newLocale );
-    
 }

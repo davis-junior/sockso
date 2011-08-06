@@ -46,6 +46,10 @@ import edu.stanford.ejalbert.BrowserLauncher;
 import edu.stanford.ejalbert.exception.BrowserLaunchingInitializingException;
 import edu.stanford.ejalbert.exception.UnsupportedOperatingSystemException;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
+@Singleton
 public class AppFrame extends JFrame implements PropertiesListener, Manager {
     
     private static final Logger log = Logger.getLogger( AppFrame.class );
@@ -65,6 +69,7 @@ public class AppFrame extends JFrame implements PropertiesListener, Manager {
      * 
      */
     
+    @Inject
     public AppFrame( final Database db, final Properties p, final Server sv, final CollectionManager cm, final Resources r, final IpFinder ipFinder ) {
 
         super( r == null ? "" : r.getCurrentLocale().getString("gui.window.main") + " (" +Sockso.VERSION+ ")" );

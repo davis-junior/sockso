@@ -54,7 +54,7 @@ public class IntegrationTestCase extends SocksoTestCase {
     public HttpServer getHttpServer() throws Exception {
 
         if ( httpServer == null ) {
-            httpServer = new HttpServer( 4444, null, getDatabase(), getProperties(), getResources() );
+            httpServer = new HttpServer( null, getDatabase(), getProperties(), getResources() );
             httpServer.start();
         }
 

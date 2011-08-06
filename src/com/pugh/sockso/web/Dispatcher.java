@@ -1,10 +1,10 @@
 
 package com.pugh.sockso.web;
 
-import com.google.inject.Inject;
 import com.pugh.sockso.ObjectCache;
 import com.pugh.sockso.Constants;
 import com.pugh.sockso.Properties;
+
 import com.pugh.sockso.auth.DBAuthenticator;
 import com.pugh.sockso.db.Database;
 import com.pugh.sockso.music.CollectionManager;
@@ -40,9 +40,9 @@ import com.pugh.sockso.web.action.playlist.M3uer;
 import com.pugh.sockso.web.action.playlist.Plser;
 import com.pugh.sockso.web.action.playlist.Xspfer;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
-import com.pugh.sockso.auth.Authenticator;
 
 /**
  *  looks at the request to determine which web action to invoke
@@ -127,7 +127,7 @@ public class Dispatcher {
         
         else if ( command.equals("user") ) {
             final Userer u = injector.getInstance( Userer.class );
-            u.addAuthenticator( injector.getInstance(Authenticator.class) );
+            u.addAuthenticator( injector.getInstance(DBAuthenticator.class) );
             action = u;
         }
         

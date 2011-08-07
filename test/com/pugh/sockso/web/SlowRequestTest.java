@@ -3,15 +3,13 @@ package com.pugh.sockso.web;
 
 import com.pugh.sockso.tests.SocksoTestCase;
 import com.pugh.sockso.tests.SocksoTestModule;
-import com.pugh.sockso.tests.TestOptionSet;
 
 import java.net.*;
 import java.io.*;
 
-import joptsimple.OptionSet;
-
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
 import org.hsqldb.lib.StringInputStream;
 
 public class SlowRequestTest extends SocksoTestCase {

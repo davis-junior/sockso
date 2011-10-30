@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import com.google.inject.Inject;
 
 /**
- *  an action to import a playlist
+ *  an action to import playlists
  * 
  */
 
@@ -45,6 +45,7 @@ public class ImportPlaylist implements ActionListener {
     private final CollectionManager cm;
     private final Resources r;
     private final Locale locale;
+    private final JFileChooser fc;
 
     @Inject
     public ImportPlaylist( final AppFrame parent, final Database db, final CollectionManager cm,
@@ -55,6 +56,7 @@ public class ImportPlaylist implements ActionListener {
         this.cm = cm;
         this.r = r;
         this.locale = locale;
+        this.fc = new JFileChooser();
         
     }
 
@@ -62,27 +64,32 @@ public class ImportPlaylist implements ActionListener {
 
         String error = "";
 
-        final JFileChooser fc = new JFileChooser();
+
         fc.addChoosableFileFilter( new PlaylistFileFilter(locale) );
+        fc.setMultiSelectionEnabled( true );
 
         if ( fc.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION ) {
 
             try {
 
-                final File file = fc.getSelectedFile();
-                final String playlistName = getPlaylistName( file );
-                final int playlistId = importPlaylist( file, playlistName );
+                final File files[] = fc.getSelectedFiles();
 
-                if ( playlistId == -1 ) {
-                    error = locale.getString("gui.message.playlistImportFailed");
+                for ( int i = 0; i < files.length; i++ ) {
+
+                    final String playlistName = getPlaylistName( files[i] );
+                    final int playlistId = importPlaylist( files[i], playlistName );
+
+                    if ( playlistId == -1 ) {
+                        error = locale.getString("gui.message.playlistsImportFailed");
+                        return;
+                    }
+
                 }
-                else {
-                    JOptionPane.showMessageDialog(
-                        parent, locale.getString("gui.message.playlistImported"),
-                        "Sockso", JOptionPane.INFORMATION_MESSAGE
-                    );
-                    return;
-                }
+                JOptionPane.showMessageDialog(
+                    parent, locale.getString("gui.message.playlistsImported"),
+                    "Sockso", JOptionPane.INFORMATION_MESSAGE
+                );
+                return;
 
             }
 

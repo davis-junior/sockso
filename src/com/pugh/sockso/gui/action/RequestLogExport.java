@@ -25,6 +25,8 @@ public class RequestLogExport extends RequestLogAction {
     private final Locale locale;
     
     private final JComboBox formats;
+
+    private final JFileChooser chooser;
     
     public RequestLogExport( final JFrame parent, final Database db, final Locale locale,
                              final JComboBox formats ) {
@@ -33,6 +35,7 @@ public class RequestLogExport extends RequestLogAction {
         this.db = db;
         this.locale = locale;
         this.formats = formats;
+        this.chooser = new JFileChooser();
         
     }
     
@@ -45,7 +48,6 @@ public class RequestLogExport extends RequestLogAction {
     
     public void actionPerformed( ActionEvent evt ) {
 
-        final JFileChooser chooser = new JFileChooser();      
         final int result = chooser.showSaveDialog( parent );
         
         if ( result == JFileChooser.APPROVE_OPTION ) {

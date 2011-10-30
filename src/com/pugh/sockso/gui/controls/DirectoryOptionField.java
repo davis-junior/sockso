@@ -32,12 +32,15 @@ public class DirectoryOptionField extends JPanel implements ActionListener {
     private JFrame parent;
     private JButton browse;
     private JTextField field;
+
+    private JFileChooser chooser;
     
     public DirectoryOptionField( JFrame parent, Properties p, String name, Locale locale ) {
         
         this.parent = parent;
         this.p = p;
         this.name = name;
+        this.chooser = new JFileChooser();
         
         initComponents( locale );
         initLayout();
@@ -110,8 +113,6 @@ public class DirectoryOptionField extends JPanel implements ActionListener {
      */
     
     protected File chooseFolder() {
-
-        JFileChooser chooser = new JFileChooser();
         
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         

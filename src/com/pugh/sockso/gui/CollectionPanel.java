@@ -53,6 +53,7 @@ public class CollectionPanel extends JPanel implements CollectionManagerListener
     private final Properties p;
     private final Injector injector;
     private final Locale locale;
+    private final JFileChooser chooser;
 
     /**
      *  Creates a new instance of CollectionPanel
@@ -70,6 +71,7 @@ public class CollectionPanel extends JPanel implements CollectionManagerListener
         this.r = r;
         this.p = p;
         this.locale = locale;
+        this.chooser = new JFileChooser();
         
         feedback = new JLabel();
         
@@ -159,7 +161,6 @@ public class CollectionPanel extends JPanel implements CollectionManagerListener
         File newFolder = null;
         
         // first get the folder to add
-        final JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         if ( chooser.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION )
             newFolder = chooser.getSelectedFile();

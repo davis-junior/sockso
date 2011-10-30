@@ -41,6 +41,8 @@ public class RescanButton extends JButton implements ActionListener {
     private final Locale locale;
     
     private JPopupMenu menu;
+
+    private final JFileChooser chooser;
     
     /**
      *  Create a new rescan button
@@ -64,6 +66,7 @@ public class RescanButton extends JButton implements ActionListener {
         this.parentFrame = parentFrame;
         this.db = db;
         this.locale = locale;
+        this.chooser = new JFileChooser();
         
     }
     
@@ -196,8 +199,6 @@ public class RescanButton extends JButton implements ActionListener {
      */
     
     protected File getFolderToScan() {
-        
-        final JFileChooser chooser = new JFileChooser();
         
         chooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
         
